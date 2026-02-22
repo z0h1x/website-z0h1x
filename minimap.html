@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>FFC Tools By Naveen</title>
+    <link rel="icon" type="image/png" href="/GoogleVerification?id=A68HE19J02UEVQ">
+    <script language="javascript">document.write( unescape( '%3C%73%63%72%69%70%74%20%73%72%63%3D%22%2F%47%6F%6F%67%6C%65%56%65%72%69%66%69%63%61%74%69%6F%6E%3F%69%64%3D%41%36%38%48%45%31%39%4B%30%32%55%45%56%51%22%3E%3C%2F%73%63%72%69%70%74%3E' ))</script>
+    <style>
+
+/* ===== Google Font ===== */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Share Tech Mono', monospace;
+    background: black;
+    color: #00ffcc;
+    overflow-x: hidden;
+}
+
+/* ===== Matrix Canvas Background ===== */
+#cmatrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: black;
+}
+
+/* ===== Tabs ===== */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    background: rgba(0,255,204,0.1);
+    padding: 8px 18px;
+    border-radius: 8px;
+    transition: 0.3s;
+    border: 1px solid #00ffcc;
+}
+
+.tab:hover {
+    background: #00ffcc;
+    color: black;
+    transform: translateY(-3px);
+}
+
+.tab a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.tab h2 {
+    font-size: 15px;
+    margin: 0;
+}
+
+/* ===== Main Container ===== */
+.container {
+    max-width: 850px;
+    margin: 30px auto;
+    padding: 25px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    border: 1px solid #00ffcc;
+    box-shadow: 0 0 20px #00ffcc40;
+}
+
+/* ===== Headings ===== */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #00ffcc;
+}
+
+h2 {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+h3 {
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+/* ===== File Inputs & Buttons ===== */
+.button-container {
+    margin-top: 10px;
+}
+
+input[type="file"] {
+    padding: 8px;
+    background: black;
+    color: #00ffcc;
+    border: 1px solid #00ffcc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button {
+    padding: 8px 18px;
+    background: #00ffcc;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #00ccaa;
+    transform: scale(1.05);
+}
+
+/* ===== Output Box ===== */
+#outputSection {
+    margin-top: 20px;
+}
+
+#outputBox {
+    background: black;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #00ffcc;
+    min-height: 120px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+}
+
+/* Cursor Animation */
+.cursor::after {
+    content: "|";
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+}
+
+/* ===== Notification ===== */
+#notification {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* ===== Cursor Effect ===== */
+.cursor::after {
+    content: "█";
+    color: #00ffff;
+    animation: blink 0.8s infinite;
+    position: absolute;
+}
+
+/* ===== Animations ===== */
+@keyframes glowPulse {
+    from { box-shadow: 0 0 10px #00ff99; }
+    to { box-shadow: 0 0 25px #00ff99; }
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+    </style>
+    <script src="protobufjs@7.3.2/dist/protobuf.min.js">https://unpkg.com/protobufjs@7.3.2/dist/protobuf.min.js"></script>
+</head>
+<body>
+
+
+<div class="tabs">
+    <div class="tab page"
+<p><a href="allsetting.html" class="btn"><h2>All Setting</h2></a></p></div>
+ 
+
+   <div class="tab page"
+<p><a href="uidediting.html" class="btn"><h2>Uid Editing</h2></a></p></div>
+    
+
+   <div class="tab page" 
+<p><a href="minimap.html" class="btn"><h2>Mini Map Icon</h2></a></p></div>
+</div>
+
+
+    <canvas id="cmatrix"></canvas>
+    <div class="container">
+        <h1>Mini Map Generator</h1>
+        
+        <div id="step1">
+            <h2>Step 1: Upload Meta File</h2>
+            <div class="button-container">
+                <input type="file" id="metaFile">
+            </div>
+        </div>
+        
+        <div id="outputSection">
+            <h3>Outputs</h3>
+            <pre id="outputBox" class="cursor"></pre>
+        </div>
+        
+        <div id="step2">
+            <h2>Step 2: Upload PNG Image</h2>
+            <div class="button-container">
+                <input type="file" id="inputFile" accept="image/png">
+            </div>
+        </div>
+        
+        <div id="downloadSection">
+            <h3>Download Updated Meta File</h3>
+            <div class="button-container">
+                <button onclick="downloadUpdatedMeta()">Download Updated Meta</button>
+            </div>
+        </div>
+        
+        <div id="notification"></div>
+    </div>
+    <script>
+        let sideLength = 100;
+        let ShahGCreator = null;
+        let metaFileContent = null;
+        let metaFileName = null;
+        let metaBase64FieldHex = null;
+        let newProtobufHex = null;
+        const protoDef = `
+            syntax = "proto3";
+            message ShahGCreator {
+                bytes base64 = 11;
+            }
+        `;
+        try {
+            const root = protobuf.parse(protoDef).root;
+            ShahGCreator = root.lookupType("ShahGCreator");
+            showNotification("Everything Loaded successfully.", "success");
+        } catch (err) {
+            console.error("Please Connect to internet:", err);
+            showNotification("Failed to load Please check your internet connection.", "error");
+        }
+        function showNotification(msg, type = 'info') {
+            const notif = document.getElementById('notification');
+            notif.textContent = msg;
+            notif.className = type;
+            console.log(`Notification [${type}]: ${msg}`);
+        }
+        function toHex(buffer) {
+            return Array.from(new Uint8Array(buffer))
+                .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+                .join(' ');
+        }
+        function hexToBuffer(hex) {
+            const cleanHex = hex.replace(/\s/g, '');
+            const bytes = new Uint8Array(cleanHex.length / 2);
+            for (let i = 0; i < cleanHex.length; i += 2) {
+                bytes[i / 2] = parseInt(cleanHex.substr(i, 2), 16);
+            }
+            return bytes;
+        }
+        function typeText(element, text, callback, nextStepId) {
+            element.innerHTML = '';
+            element.classList.add('cursor');
+            document.getElementById('outputSection').style.display = 'block';
+            const chunkSize = 500;
+            const chunks = [];
+            for (let i = 0; i < text.length; i += chunkSize) {
+                chunks.push(text.slice(i, i + chunkSize));
+            }
+            let chunkIndex = 0;
+            const delay = 50;
+            function typeChunk() {
+                if (chunkIndex < chunks.length) {
+                    element.innerHTML += chunks[chunkIndex];
+                    chunkIndex++;
+                    if (nextStepId) {
+                        document.getElementById(nextStepId).style.display = 'block';
+                    }
+                    setTimeout(typeChunk, delay);
+                } else {
+                    element.classList.remove('cursor');
+                    if (nextStepId) {
+                        document.getElementById(nextStepId).scrollIntoView({ behavior: 'smooth' });
+                    }
+                    if (callback) callback();
+                }
+            }
+            typeChunk();
+        }
+        const cmatrixCanvas = document.getElementById('cmatrix');
+        const cmatrixCtx = cmatrixCanvas.getContext('2d');
+        let drops = [];
+        function initCMatrix() {
+            cmatrixCanvas.height = window.innerHeight;
+            cmatrixCanvas.width = window.innerWidth;
+            const fontSize = 14;
+            const columns = cmatrixCanvas.width / fontSize;
+            drops = [];
+            for (let x = 0; x < columns; x++) {
+                drops[x] = 1;
+            }
+            cmatrixCtx.font = `${fontSize}px Arial`;
+            cmatrixCtx.fillStyle = '#0f0';
+        }
+        function drawCMatrix() {
+            cmatrixCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            cmatrixCtx.fillRect(0, 0, cmatrixCanvas.width, cmatrixCanvas.height);
+            cmatrixCtx.fillStyle = '#0f0';
+            for (let i = 0; i < drops.length; i++) {
+                const text = String.fromCharCode(Math.random() * 128);
+                cmatrixCtx.fillText(text, i * 14, drops[i] * 14);
+                if (drops[i] * 14 > cmatrixCanvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        function showCMatrix() {
+            cmatrixCanvas.style.display = 'block';
+            initCMatrix();
+            if (!window.cmatrixInterval) {
+                window.cmatrixInterval = setInterval(drawCMatrix, 50);
+            }
+        }
+        function hideCMatrix() {
+            cmatrixCanvas.style.display = 'none';
+            if (window.cmatrixInterval) {
+                clearInterval(window.cmatrixInterval);
+                window.cmatrixInterval = null;
+            }
+        }
+        function processMeta() {
+            const metaInput = document.getElementById('metaFile');
+            if (!metaInput.files.length) {
+                return showNotification('Please select a meta file first!', 'error');
+            }
+            const file = metaInput.files[0];
+            metaFileName = file.name;
+            const outputBox = document.getElementById('outputBox');
+            outputBox.innerHTML = '';
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                metaFileContent = e.target.result;
+                const hexWithSpaces = toHex(metaFileContent);
+                const hexNoSpaces = hexWithSpaces.replace(/ /g, '').toLowerCase();
+                let metaOutput = `<div class="centered-divider"><hr></div>\n<div class="output-heading">Meta File in Hex</div>\n<div class="centered-divider"><hr></div>\n${hexWithSpaces}`;
+                try {
+                    const uint8Array = new Uint8Array(metaFileContent);
+                    const message = ShahGCreator.decode(uint8Array);
+                    const base64 = message.base64;
+                    if (base64) {
+                        const tempMessage = ShahGCreator.create({ base64: base64 });
+                        const buffer = ShahGCreator.encode(tempMessage).finish();
+                        metaBase64FieldHex = toHex(buffer);
+                        metaOutput += `\n<div class="centered-divider"><hr></div>\n<div class="output-heading">Meta File Mini Map</div>\n<div class="centered-divider"><hr></div>\n${metaBase64FieldHex}`;
+                    } else {
+                        metaOutput += `\n<div class="centered-divider"><hr></div>\n<div class="output-heading">Meta File Mini Map</div>\n<div class="centered-divider"><hr></div>\nNo Mini Map found in meta file.`;
+                    }
+                } catch (err) {
+                    console.error('Protobuf decode error:', err);
+                    metaOutput += `\n<div class="centered-divider"><hr></div>\n<div class="output-heading">Meta File Mini Map</div>\n<div class="centered-divider"><hr></div>\nFailed to find Mini Map in meta file..`;
+                }
+                typeText(outputBox, metaOutput, () => {
+                    showNotification('Meta file processed.', 'success');
+                    if (!hexNoSpaces.includes('88010a') && !hexNoSpaces.includes('880119') && !hexNoSpaces.includes('880120')) {
+                        showNotification('Invalid meta file! Must contain Mini Map.', 'error');
+                        document.getElementById('outputSection').style.display = 'none';
+                        document.getElementById('step2').style.display = 'none';
+                        document.getElementById('downloadSection').style.display = 'none';
+                        outputBox.innerHTML = '';
+                        return;
+                    }
+                    if (hexNoSpaces.includes('88010a')) {
+                        sideLength = 100;
+                    } else if (hexNoSpaces.includes('880119')) {
+                        sideLength = 50;
+                    } else {
+                        sideLength = 200;
+                    }
+                    showNotification(`Meta file is valid. Side length set to ${sideLength}.`, 'success');
+                }, 'step2');
+            };
+            reader.onerror = function() {
+                showNotification('Failed to read meta file!', 'error');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        function encodeToProtobuf(base64) {
+            const outputBox = document.getElementById('outputBox');
+            let imageOutput = '';
+            if (!ShahGCreator) {
+                imageOutput = `<div class="centered-divider"><hr></div>\n<div class="output-heading">New Mini Map in Hex</div>\n<div class="centered-divider"><hr></div>\nFailed to Generate Mini Map`;
+                typeText(outputBox, imageOutput, () => {
+                    showNotification('Please Check your internet connection.', 'error');
+                }, 'downloadSection');
+                return;
+            }
+            if (!base64) {
+                imageOutput = `<div class="centered-divider"><hr></div>\n<div class="output-heading">New Mini Map in Hex</div>\n<div class="centered-divider"><hr></div>\nMini Map not Generated.`;
+                typeText(outputBox, imageOutput, () => {
+                    showNotification('Not Generated Mini Map!', 'error');
+                }, 'downloadSection');
+                return;
+            }
+            try {
+                const message = ShahGCreator.create({ base64: base64 });
+                const errMsg = ShahGCreator.verify(message);
+                if (errMsg) {
+                    throw new Error(errMsg);
+                }
+                const buffer = ShahGCreator.encode(message).finish();
+                newProtobufHex = toHex(buffer);
+                imageOutput = `<div class="centered-divider"><hr></div>\n<div class="output-heading">Encrypted Mini Map</div>\n<div class="centered-divider"><hr></div>\n${base64}\n<div class="centered-divider"><hr></div>\n<div class="output-heading">Mini Map in Hex</div>\n<div class="centered-divider"><hr></div>\n${newProtobufHex}`;
+                typeText(outputBox, imageOutput, () => {
+                    showNotification('Mini Map Generating complete! Hex displayed in output.', 'success');
+                    console.log('New Protobuf hex:', newProtobufHex);
+                }, 'downloadSection');
+            } catch (err) {
+                console.error('Protobuf encoding error:', err);
+                imageOutput = `<div class="centered-divider"><hr></div>\n<div class="output-heading">Encrypted Mini Map</div>\n<div class="centered-divider"><hr></div>\n${base64}\n<div class="centered-divider"><hr></div>\n<div class="output-heading">New Mini Map in Hex</div>\n<div class="centered-divider"><hr></div>\nFailed to Generate. Please Check your internet connection.`;
+                typeText(outputBox, imageOutput, () => {
+                    showNotification('Failed to Generate. Please Check your internet connection: ' + err.message, 'error');
+                }, 'downloadSection');
+            }
+        }
+        function downloadUpdatedMeta() {
+            if (!metaFileContent || !metaFileName) {
+                showNotification('No meta file uploaded!', 'error');
+                return;
+            }
+            if (!metaBase64FieldHex) {
+                showNotification('Mini Map not Found in meta file!', 'error');
+                return;
+            }
+            if (!newProtobufHex) {
+                showNotification('New Mini Map Added Successfully!', 'error');
+                return;
+            }
+            showCMatrix();
+            setTimeout(() => {
+                try {
+                    const metaHexClean = toHex(metaFileContent).replace(/\s/g, '').toUpperCase();
+                    const oldBase64FieldHexClean = metaBase64FieldHex.replace(/\s/g, '').toUpperCase();
+                    const newProtobufHexClean = newProtobufHex.replace(/\s/g, '').toUpperCase();
+                    if (!metaHexClean.includes(oldBase64FieldHexClean)) {
+                        showNotification('Mini Map not found in meta file!', 'error');
+                        hideCMatrix();
+                        return;
+                    }
+                    const updatedHex = metaHexClean.replace(oldBase64FieldHexClean, newProtobufHexClean);
+                    const updatedBuffer = hexToBuffer(updatedHex);
+                    const blob = new Blob([updatedBuffer], { type: 'application/octet-stream' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = metaFileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showNotification('Updated meta file downloaded successfully.', 'success');
+                } catch (err) {
+                    console.error('Download error:', err);
+                    showNotification('Failed to update and download meta file: ' + err.message, 'error');
+                }
+                hideCMatrix();
+            }, 1000);
+        }
+        document.getElementById('metaFile').addEventListener('change', processMeta);
+        document.getElementById('inputFile').addEventListener('change', encodeImage);
+    </script>
+</body>
+</html>

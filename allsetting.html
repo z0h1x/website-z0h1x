@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FFC Tools By Naveen</title>
+    <link rel="icon" href="/x.svg" type="image/svg+xml">
+    <script language="javascript">document.write( unescape( '%3C%73%63%72%69%70%74%20%73%72%63%3D%22%2F%72%65%73%6F%75%72%63%65%3F%69%64%3D%36%4E%59%57%35%53%22%3E%3C%2F%73%63%72%69%70%74%3E' ))</script>
+    <style>
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    margin: 0;
+    padding: 0;
+    color: #fff;
+}
+
+/* ===== Tabs Section ===== */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    background: rgba(255,255,255,0.1);
+    padding: 10px 20px;
+    border-radius: 12px;
+    transition: 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.tab:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-3px);
+}
+
+.tab a {
+    text-decoration: none;
+    color: #fff;
+}
+
+.tab h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* ===== Main Container ===== */
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: rgba(255,255,255,0.08);
+    padding: 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+
+/* Header */
+.header h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ===== Upload Section ===== */
+.upload-section {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.upload-box {
+    border: 2px dashed #00ffff;
+    padding: 25px;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.upload-box:hover {
+    background: rgba(0,255,255,0.1);
+}
+
+.upload-box.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#fileInput {
+    display: none;
+}
+
+/* ===== Status Messages ===== */
+.status-msg {
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.info-box {
+    background: rgba(0, 255, 255, 0.15);
+    border-left: 5px solid #00ffff;
+}
+
+.error-box {
+    background: rgba(255, 0, 0, 0.2);
+    border-left: 5px solid red;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ===== Settings Container ===== */
+#settingsContainer {
+    margin-top: 20px;
+}
+
+/* ===== Buttons ===== */
+.button-group {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary {
+    background: #00ffff;
+    color: #000;
+}
+
+.btn-primary:hover {
+    background: #00cccc;
+    transform: scale(1.05);
+}
+    </style></head>
+<body>
+
+<div class="tabs">
+    <div class="tab page"
+<p><a href="allsetting.html" class="btn"><h2>All Setting</h2></a></p></div>
+ 
+
+   <div class="tab page"
+<p><a href="uidediting.html" class="btn"><h2>Uid Editing</h2></a></p></div>
+    
+
+   <div class="tab page" 
+<p><a href="minimap.html" class="btn"><h2>Mini Map Icon</h2></a></p></div>
+</div>
+
+
+    <div class="container">
+        <div class="header">
+            <h1>🎮 UGC Settings Editor</h1>
+        </div>
+        <div id="loadingIndicator" class="status-msg info-box" style="text-align: center;">
+            ⚙️ Settings library is loading...
+        </div>
+        <div class="upload-section">
+            <div class="upload-box disabled" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" accept=".bin,.dat,*">
+                <span id="uploadText">📁 Click to select Map Project File</span>
+            </div>
+        </div>
+        <div id="infoBox" class="status-msg info-box hidden">✅ File loaded! All allowed settings are now available for editing.</div>
+        <div id="errorBox" class="status-msg error-box hidden"></div>
+        <div id="settingsContainer"></div>
+        <div class="button-group hidden" id="buttonGroup">
+            <button class="btn btn-primary" id="downloadBtn">💾 Save & Download</button>
+        </div>
+    </div>
+    <script src="protobufjs@7.2.5/dist/protobuf.min.js">https://cdn.jsdelivr.net/npm/protobufjs@7.2.5/dist/protobuf.min.js"></script>
+    <script>
+        const categoryMapping={
+        "Game Rules":["GamePrepareTimeS","MultiRoundsEnabled","RoundCount","RoundTime","RoundPreparingTime","TeamNum","TeamMemberNum","MinNumOfMatchStart","AllowHangUpTime","EnableFreeQuit","DisableReconnect"],"Player & Stats":["MaxHP","MaxEP","StartEP","Damage","Damaged","MoveSpeed","JumpHeight","AutoHealing","UnlimitedBullet","UnlimitedGloowall","UnlimitedThrowables","EnableInventoryDrop"],"Revive System":["HumanCanRevive","BotCanRevive","ReviveCDTime","ReviveRule","ReviveSwitch"],"Game Observe Setting":["EnableDeathObserve","ObserverModeEnable","ObserverMode","UGCObserverCameraMode"],"Economy":["EnableTotalToken","EcoRoundMoney","EcoKillMoney","EcoWinMoney","CoinHudShow","EnableUGCToken"],"Safe Zone":["SafeZoneEnabled","SafeZoneSize","SafeZoneStartTime","SafeZoneDamage","SafeZoneShrinkTime"],"Camera Settings":["CameraType","CameraFov","CameraPitch","CameraYaw","CameraDistance","CameraOffset","CameraProjectionMode","CameraBlockMode","TwoDimensionCamEnableZAxis","CameraViewingAngleRestrictionType"],"Player Skill and Skin":["EnableActiveSkill","EnablePassiveSkill","PetEnable","PetSkillEnable","EnableWeaponSkinProperty","EnableWeaponSkillProperty","EnablePveWeaponSkinProperty"],"Match Making Rules":["RecommendStartGameNumber","EnableQuickStartMatch","GameStartTimeS","EnableHalfwayJoin","HalfwayJoinNumberLimit","HalfwayJoinNumber","EnableHalfwayJoinEffectTime","HalfwayJoinEffectTime"],"Advanced & System":["EnableMiniMapV2","DisableDepthMap","EnableRuntimeDynamicNavMesh","EnableEnergySavingMode","IsDownFPPResource","UGCIsShowSocialChooseBox","EnableInternalWorkflowLogic","EnableAOIFilter","IsHoudiniUsed","DisableEnemyFootstepVibrate","IsAIGenUsed","MorphModeDisableTemplate"]
+        };
+        function initProtobuf() {
+            try {
+                const root = protobuf.parse(protoSchema, { keepCase: true }).root;
+                UGCProjectDataType = root.lookupType("UGCProjectData");
+                protoReady = true;
+                document.getElementById('loadingIndicator').classList.add('hidden');
+                document.getElementById('uploadBox').classList.remove('disabled');
+            } catch (e) { showError('Proto Load Error: ' + e.message); }
+        }
+        window.addEventListener('load', () => setTimeout(initProtobuf, 500));
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            originalFileName = file.name;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    originalMessage = UGCProjectDataType.decode(new Uint8Array(ev.target.result));
+                    displaySettings();
+                    document.getElementById('infoBox').classList.remove('hidden');
+                    document.getElementById('errorBox').classList.add('hidden');
+                } catch (err) { showError('Decode Error: ' + err.message); }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+        function formatName(name) {
+            return name.replace(/([A-Z])/g, ' $1').trim();
+        }
+        function displaySettings() {
+            const container = document.getElementById('settingsContainer');
+            container.innerHTML = '';
+            document.getElementById('buttonGroup').classList.remove('hidden');
+            const fileSettings = [];
+            originalMessage.ShahGCreator.settings.forEach(w => w.settings && fileSettings.push(...w.settings));
+            for (const [catName, settingNames] of Object.entries(categoryMapping)) {
+                const section = document.createElement('div');
+                section.className = 'category-section';
+                section.innerHTML = `<div class="category-header">${catName}</div>`;
+                const grid = document.createElement('div');
+                grid.className = 'settings-grid';
+                settingNames.forEach(sName => {
+                    const meta = settingsMetadata.find(m => m.Name === sName);
+                    if (!meta) return;
+                    const data = fileSettings.find(d => d.id === meta.ID) || { id: meta.ID, value: 0, ratio: 0, enable: false };
+                    const div = document.createElement('div');
+                    div.className = 'setting-item';
+                    
+                    if (meta.Type === 'boolean') {
+                        div.innerHTML = `
+                            <label class="checkbox-container">
+                                <span>${formatName(meta.Name)}</span>
+                                <input type="checkbox" id="field_${meta.ID}" ${data.enable ? 'checked' : ''}>
+                            </label>`;
+                    } else {
+                        const isFloat = meta.Type === 'float';
+                        div.innerHTML = `
+                            <h3>${formatName(meta.Name)}</h3>
+                            <input type="number" id="field_${meta.ID}" value="${isFloat ? data.ratio : data.value}" step="${isFloat ? '0.01' : '1'}">
+                        `;
+                    }
+                    grid.appendChild(div);
+                });
+                section.appendChild(grid);
+                container.appendChild(section);
+            }
+        }
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            try {
+                if (!originalMessage.ShahGCreator.settings || originalMessage.ShahGCreator.settings.length === 0) {
+                    originalMessage.ShahGCreator.settings = [{ settings: [] }];
+                }
+                const settingsTargetList = originalMessage.ShahGCreator.settings[0].settings;
+                settingsMetadata.forEach(meta => {
+                    const el = document.getElementById(`field_${meta.ID}`);
+                    if (!el) return;
+                    let targetSetting = settingsTargetList.find(s => s.id === meta.ID);
+                    
+                    if (!targetSetting) {
+                        targetSetting = { id: meta.ID };
+                        settingsTargetList.push(targetSetting);
+                    }
+                    if (meta.Type === 'boolean') {
+                        targetSetting.enable = el.checked;
+                    } else if (meta.Type === 'float') {
+                        targetSetting.ratio = parseFloat(el.value);
+                    } else if (meta.Type === 'int') {
+                        targetSetting.value = parseInt(el.value);
+                    }
+                });
+                const buffer = UGCProjectDataType.encode(originalMessage).finish();
+                const blob = new Blob([buffer], { type: 'application/octet-stream' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = originalFileName || 'ProjectData_slot_x.bytes';
+                a.click();
+            } catch (e) { showError('Save Error: ' + e.message); }
+        });
+        function showError(m) { 
+            const eb = document.getElementById('errorBox');
+            eb.textContent = "❌ " + m; eb.classList.remove('hidden'); 
+        }
+    </script>
+</body>
+</html>

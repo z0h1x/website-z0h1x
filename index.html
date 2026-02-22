@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+<title>Secure Access</title>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Share Tech Mono', monospace;
+    background: black;
+    overflow: hidden;
+    color: #00ff00;
+}
+
+/* ===== Matrix Background Canvas ===== */
+#matrix {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: black;
+}
+
+/* ===== Login Box ===== */
+.login-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid #00ff00;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #00ff00;
+    text-align: center;
+}
+
+/* Title Glow */
+.login-box h2 {
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+}
+
+/* Inputs */
+.login-box input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background: black;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.login-box input:focus {
+    box-shadow: 0 0 10px #00ff00;
+}
+
+/* Main Button */
+.login-box button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background: black;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-box button:hover {
+    background: #00ff00;
+    color: black;
+    box-shadow: 0 0 20px #00ff00;
+}
+
+/* Link Button */
+.link-btn {
+    display: block;
+    margin-top: 15px;
+    padding: 8px;
+    border: 1px solid #00ff00;
+    text-decoration: none;
+    color: #00ff00;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.link-btn:hover {
+    background: #00ff00;
+    color: black;
+    box-shadow: 0 0 15px #00ff00;
+}
+
+/* Error Message */
+.error {
+    margin-top: 10px;
+    color: red;
+    font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="login-box" id="box">
+    <h2>⚡ SYSTEM ACCESS ⚡</h2>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="login()">ENTER SYSTEM</button>
+
+    <!-- Password Help Button -->
+    <a href="https://youtube.com/@naveenfflive-u9t?si=ZXOV4ZoLNtSQBfSa" class="link-btn">
+        PASSWORD HELP
+    </a>
+
+    <div class="error" id="error"></div>
+</div>
+
+<script>
+/* ==== LOGIN SYSTEM ==== */
+const USERNAME="admin";
+const PASSWORD="NAVEEN123";
+
+function login(){
+    let u=document.getElementById("username").value;
+    let p=document.getElementById("password").value;
+
+    if(u===USERNAME && p===PASSWORD){
+        window.location.href="uidediting.html";
+    }else{
+        document.getElementById("error").innerText="ACCESS DENIED";
+        let box=document.getElementById("box");
+        box.classList.add("shake");
+        setTimeout(()=>box.classList.remove("shake"),300);
+    }
+}
+
+document.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){ login(); }
+});
+
+/* ==== MATRIX EFFECT ==== */
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+
+canvas.height=window.innerHeight;
+canvas.width=window.innerWidth;
+
+let letters="01";
+letters=letters.split("");
+
+let fontSize=14;
+let columns=canvas.width/fontSize;
+let drops=[];
+
+for(let x=0;x<columns;x++){
+    drops[x]=1;
+}
+
+function draw(){
+    ctx.fillStyle="rgba(0,0,0,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="#0f0";
+    ctx.font=fontSize+"px monospace";
+
+    for(let i=0;i<drops.length;i++){
+        let text=letters[Math.floor(Math.random()*letters.length)];
+        ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+
+        if(drops[i]*fontSize>canvas.height && Math.random()>0.975){
+            drops[i]=0;
+        }
+        drops[i]++;
+    }
+}
+
+setInterval(draw,33);
+</script>
+
+</body>
+</html>
