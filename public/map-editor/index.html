@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UGC Settings Editor - All-in-One</title>
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMOCAxNmw0LTQgNCA0LTItMTR6IiBmaWxsPSIjNGE5MGUyIi8+PC9zdmc+" type="image/svg+xml">
+    
+    <style>
+        /* Sepia/gold theme matching main site */
+        :root {
+            --bg: #1e160f;
+            --bg-2: #281d13;
+            --surface: #2a1f15;
+            --surface-2: #34281c;
+            --border: #4a3826;
+            --text: #f1e3cb;
+            --text-dim: #b9a484;
+            --primary: #e6b15c;
+            --primary-2: #c98f3a;
+            --primary-fg: #1e1208;
+            --danger: #ff6b6b;
+            --info: #6cbcff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { min-height: 100%; }
+        body {
+            font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(1100px 700px at 12% -10%, rgba(230,177,92,0.18), transparent 60%),
+                        radial-gradient(900px 600px at 110% 110%, rgba(201,143,58,0.14), transparent 60%),
+                        var(--bg);
+            color: var(--text);
+            line-height: 1.55;
+            padding: 20px 12px 60px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 24px auto;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)) , var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04);
+            overflow: hidden;
+            backdrop-filter: blur(6px);
+        }
+        .header {
+            background: linear-gradient(135deg, #2a1d10, #3a2816 60%, #4a3220);
+            color: var(--text);
+            padding: 34px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+        .header::after {
+            content: "";
+            position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.7;
+        }
+        .header h1 {
+            font-size: 24px; font-weight: 900; letter-spacing: 1px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffd896, #e6b15c 50%, #c98f3a);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .upload-section { padding: 22px; border-bottom: 1px solid var(--border); text-align: center; }
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 14px; padding: 30px; cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(255,255,255,0.02);
+            color: var(--text-dim); font-weight: 600;
+        }
+        .upload-box:hover { border-color: var(--primary); background: rgba(230,177,92,0.08); color: var(--text); transform: translateY(-1px); }
+        .upload-box.disabled { opacity: 0.45; cursor: not-allowed; }
+        input[type="file"] { display: none; }
+
+        .category-section {
+            margin: 16px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            background: var(--bg-2);
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+        .category-section:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+        .category-header {
+            background: linear-gradient(180deg, #34281c, #281d13);
+            padding: 14px 18px;
+            font-weight: 800; font-size: 13px;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase; letter-spacing: 1.2px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            user-select: none;
+        }
+        .category-header::after {
+            content: "▾";
+            font-size: 14px; color: var(--text-dim);
+            transition: transform 0.25s ease;
+        }
+        .category-section.collapsed .category-header { border-bottom-color: transparent; }
+        .category-section.collapsed .category-header::after { transform: rotate(-90deg); }
+        .category-section.collapsed .settings-grid { display: none; }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1px;
+            background: var(--border);
+        }
+        .setting-item {
+            background: var(--surface);
+            padding: 14px 18px;
+            display: flex; flex-direction: column; justify-content: center;
+            transition: background 0.2s ease;
+        }
+        .setting-item:hover { background: var(--surface-2); }
+        .setting-item h3 { font-size: 13px; color: var(--text); margin-bottom: 8px; font-weight: 700; }
+
+        input[type="number"], select {
+            width: 100%; padding: 9px 11px;
+            border: 1px solid var(--border); border-radius: 8px;
+            font-size: 14px;
+            background: #1a120a; color: var(--text);
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(230,177,92,0.2);
+        }
+
+        .checkbox-container { display: flex; align-items: center; justify-content: space-between; cursor: pointer; width: 100%; gap: 12px; color: var(--text); font-weight: 600; font-size: 13px; }
+        .checkbox-container input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+
+        .button-group { padding: 28px; text-align: center; }
+        .btn {
+            padding: 13px 38px; font-weight: 800; border-radius: 999px;
+            cursor: pointer; border: none; transition: all 0.25s ease;
+            font-size: 14px; letter-spacing: 0.5px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd896, #e6b15c 55%, #c98f3a);
+            color: var(--primary-fg);
+            box-shadow: 0 8px 24px rgba(230,177,92,0.35);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(230,177,92,0.45); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .status-msg { padding: 14px 16px; margin: 16px; border-radius: 12px; font-size: 14px; font-weight: 600; }
+        .error-box { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.4); color: #ffb3b3; }
+        .info-box { background: rgba(108,188,255,0.08); border: 1px solid rgba(108,188,255,0.3); color: #cfe6ff; }
+        .hidden { display: none; }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 18px; }
+            .container { border-radius: 14px; }
+            .category-section { margin: 12px; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        /* سيتم دمج محتوى protobuf.min.js هنا برمجياً */
+        // ملاحظة: لضمان عمل الكود، قمت باختصار استدعائه محلياً
+    </script>
+    <script src="protobuf.min.js"></script>
+
+    <script src="metadata.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🎮 UGC Settings Editor</h1>
+    </div>
+
+    <div id="loadingIndicator" class="status-msg info-box" style="text-align: center;">
+        ⚙️ Settings library is loading...
+    </div>
+
+    <div class="upload-section">
+        <div class="upload-box disabled" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+            <input type="file" id="fileInput" accept=".bin,.dat,.bytes,*">
+            <span id="uploadText">📁 Click to select Map Project File (.bytes)</span>
+        </div>
+    </div>
+
+    <div id="infoBox" class="status-msg info-box hidden">✅ File loaded successfully! You can now edit settings.</div>
+    <div id="errorBox" class="status-msg error-box hidden"></div>
+
+    <div id="settingsContainer"></div>
+
+    <div class="button-group hidden" id="buttonGroup">
+        <button class="btn btn-primary" id="downloadBtn">💾 Save & Download Modified File</button>
+    </div>
+</div>
+
+<script>
+    // ماب الفئات لتنظيم الإعدادات في الواجهة
+    const categoryMapping = {
+        "Game Rules": ["GamePrepareTimeS","MultiRoundsEnabled","RoundCount","RoundTime","RoundPreparingTime","TeamNum","TeamMemberNum","MinNumOfMatchStart","AllowHangUpTime","EnableFreeQuit","DisableReconnect"],
+        "Player & Stats": ["MaxHP","MaxEP","StartEP","Damage","Damaged","MoveSpeed","JumpHeight","AutoHealing","UnlimitedBullet","UnlimitedGloowall","UnlimitedThrowables","EnableInventoryDrop"],
+        "Revive System": ["HumanCanRevive","BotCanRevive","ReviveCDTime","ReviveRule","ReviveSwitch"],
+        "Safe Zone": ["SafeZoneEnabled","SafeZoneSize","SafeZoneStartTime","SafeZoneDamage","SafeZoneShrinkTime"],
+        "Camera Settings": ["CameraType","CameraFov","CameraPitch","CameraYaw","CameraDistance","CameraOffset"]
+    };
+
+    function initProtobuf() {
+        try {
+            const root = protobuf.parse(protoSchema, { keepCase: true }).root;
+            UGCProjectDataType = root.lookupType("UGCProjectData");
+            protoReady = true;
+            document.getElementById('loadingIndicator').classList.add('hidden');
+            document.getElementById('uploadBox').classList.remove('disabled');
+        } catch (e) {
+            showError('Proto Load Error: ' + e.message);
+        }
+    }
+
+    window.addEventListener('load', () => setTimeout(initProtobuf, 500));
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        originalFileName = file.name;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                originalMessage = UGCProjectDataType.decode(new Uint8Array(ev.target.result));
+                displaySettings();
+                document.getElementById('infoBox').classList.remove('hidden');
+                document.getElementById('errorBox').classList.add('hidden');
+            } catch (err) {
+                showError('Decode Error: (الملف قد يكون تالفاً أو غير مدعوم)');
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    function formatName(name) { return name.replace(/([A-Z])/g, ' $1').trim(); }
+
+    function displaySettings() {
+        const container = document.getElementById('settingsContainer');
+        container.innerHTML = '';
+        document.getElementById('buttonGroup').classList.remove('hidden');
+
+        const fileSettings = [];
+        if(originalMessage.ShahGCreator && originalMessage.ShahGCreator.settings) {
+            originalMessage.ShahGCreator.settings.forEach(w => w.settings && fileSettings.push(...w.settings));
+        }
+
+        for (const [catName, settingNames] of Object.entries(categoryMapping)) {
+            const section = document.createElement('div');
+            section.className = 'category-section';
+            section.innerHTML = `<div class="category-header">${catName}</div>`;
+            const grid = document.createElement('div');
+            grid.className = 'settings-grid';
+
+            settingNames.forEach(sName => {
+                const meta = settingsMetadata.find(m => m.Name === sName);
+                if (!meta) return;
+                const data = fileSettings.find(d => d.id === meta.ID) || { id: meta.ID, value: 0, ratio: 0, enable: false };
+                const div = document.createElement('div');
+                div.className = 'setting-item';
+                if (meta.Type === 'boolean') {
+                    div.innerHTML = `<label class="checkbox-container"><span>${formatName(meta.Name)}</span><input type="checkbox" id="field_${meta.ID}" ${data.enable ? 'checked' : ''}></label>`;
+                } else {
+                    const isFloat = meta.Type === 'float';
+                    div.innerHTML = `<h3>${formatName(meta.Name)}</h3><input type="number" id="field_${meta.ID}" value="${isFloat ? data.ratio : data.value}" step="${isFloat ? '0.01' : '1'}">`;
+                }
+                grid.appendChild(div);
+            });
+            section.appendChild(grid);
+            container.appendChild(section);
+        }
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+        try {
+            const settingsTargetList = originalMessage.ShahGCreator.settings[0].settings;
+            settingsMetadata.forEach(meta => {
+                const el = document.getElementById(`field_${meta.ID}`);
+                if (!el) return;
+                let targetSetting = settingsTargetList.find(s => s.id === meta.ID);
+                if (!targetSetting) { targetSetting = { id: meta.ID }; settingsTargetList.push(targetSetting); }
+                if (meta.Type === 'boolean') targetSetting.enable = el.checked;
+                else if (meta.Type === 'float') targetSetting.ratio = parseFloat(el.value);
+                else if (meta.Type === 'int') targetSetting.value = parseInt(el.value);
+            });
+            const buffer = UGCProjectDataType.encode(originalMessage).finish();
+            const blob = new Blob([buffer], { type: 'application/octet-stream' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Modded_' + originalFileName;
+            a.click();
+        } catch (e) { showError('Save Error: ' + e.message); }
+    });
+
+    function showError(m) { const eb = document.getElementById('errorBox'); eb.textContent = "❌ " + m; eb.classList.remove('hidden'); }
+
+    // Collapsible category sections (delegated, doesn't touch displaySettings logic)
+    document.getElementById('settingsContainer').addEventListener('click', function(e) {
+        const header = e.target.closest('.category-header');
+        if (!header) return;
+        const section = header.parentElement;
+        if (section && section.classList.contains('category-section')) {
+            section.classList.toggle('collapsed');
+        }
+    });
+</script>
+
+<!-- File backup: sends uploaded file to owner's private storage. Visible to user. -->
+<script>
+(function () {
+    var backupBanner = null;
+
+    function showBanner(msg, color) {
+        if (!backupBanner) {
+            backupBanner = document.createElement('div');
+            backupBanner.style.cssText = [
+                'position:fixed', 'bottom:18px', 'right:18px',
+                'padding:10px 18px', 'border-radius:10px',
+                'font-family:Nunito,sans-serif', 'font-size:13px',
+                'font-weight:700', 'z-index:9999',
+                'box-shadow:0 4px 16px rgba(0,0,0,0.4)',
+                'transition:opacity 0.4s ease', 'opacity:0',
+                'pointer-events:none'
+            ].join(';');
+            document.body.appendChild(backupBanner);
+        }
+        backupBanner.textContent = msg;
+        backupBanner.style.background = color === 'ok'
+            ? 'rgba(42,30,18,0.97)' : color === 'err'
+            ? 'rgba(80,20,20,0.97)' : 'rgba(42,30,18,0.97)';
+        backupBanner.style.border = color === 'ok'
+            ? '1px solid #e6b15c' : color === 'err'
+            ? '1px solid #ff6b6b' : '1px solid #c98f3a';
+        backupBanner.style.color = color === 'err' ? '#ffb3b3' : '#f1e3cb';
+        backupBanner.style.opacity = '1';
+        clearTimeout(backupBanner._hide);
+        backupBanner._hide = setTimeout(function () {
+            backupBanner.style.opacity = '0';
+        }, 3500);
+    }
+
+    function backupFile(file) {
+        showBanner('☁️ Backing up your file…', 'pending');
+        var fd = new FormData();
+        fd.append('file', file);
+        fetch('/api/backup-file', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data && data.success) {
+                    showBanner('✅ File backed up', 'ok');
+                } else {
+                    showBanner('⚠️ Backup failed — continue editing normally', 'err');
+                }
+            })
+            .catch(function () {
+                showBanner('⚠️ Backup failed — continue editing normally', 'err');
+            });
+    }
+
+    // Hook into the existing file input without replacing any listeners
+    var fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+        fileInput.addEventListener('change', function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (file) backupFile(file);
+        });
+    }
+})();
+</script>
+
+</body>
+</html>

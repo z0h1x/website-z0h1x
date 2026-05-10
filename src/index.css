@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* PixelOS-inspired Theme — soft cream, Material You motion */
+
+@layer base {
+  :root {
+    /* Moody sepia canvas inspired by Alucard portrait */
+    --background: 28 22% 10%;
+    --foreground: 40 35% 92%;
+
+    --card: 28 20% 14%;
+    --card-foreground: 40 35% 92%;
+
+    --popover: 28 20% 14%;
+    --popover-foreground: 40 35% 92%;
+
+    /* Signature golden amber (eyes) */
+    --primary: 42 80% 60%;
+    --primary-foreground: 28 40% 12%;
+
+    --secondary: 35 15% 70%;
+    --secondary-foreground: 28 30% 14%;
+
+    --muted: 28 15% 20%;
+    --muted-foreground: 35 18% 65%;
+
+    --accent: 38 60% 55%;
+    --accent-foreground: 28 40% 12%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 18% 22%;
+    --input: 30 18% 20%;
+    --ring: 42 80% 60%;
+
+    --radius: 1.75rem;
+
+    /* Sepia/gold/silver blob palette */
+    --blob-yellow: 42 80% 55%;
+    --blob-yellow-deep: 38 70% 45%;
+    --blob-cream: 35 25% 80%;
+    --blob-mint: 30 20% 35%;
+    --blob-olive: 35 30% 30%;
+    --blob-white: 40 30% 88%;
+
+    --shadow-soft: 0 8px 30px hsl(28 40% 4% / 0.45);
+    --shadow-pill: 0 6px 20px hsl(42 80% 40% / 0.45);
+
+    /* Material 3 expressive easing */
+    --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+}
+
+/* ===== Material You / PixelOS Animations ===== */
+
+@keyframes blob-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33% { transform: translate(30px, -40px) rotate(8deg) scale(1.05); }
+  66% { transform: translate(-25px, 25px) rotate(-6deg) scale(0.97); }
+}
+
+@keyframes blob-drift-slow {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-40px, 30px) rotate(-10deg); }
+}
+
+@keyframes spring-in {
+  0% { opacity: 0; transform: translateY(24px) scale(0.94); }
+  60% { opacity: 1; transform: translateY(-4px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.6); }
+  70% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes wordmark-reveal {
+  0% { opacity: 0; transform: translateY(20px) scale(0.96); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes dot-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes soft-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.85; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Utility classes */
+.animate-blob-drift { animation: blob-drift 18s var(--ease-standard) infinite; }
+.animate-blob-drift-slow { animation: blob-drift-slow 26s var(--ease-standard) infinite; }
+.animate-spring-in { animation: spring-in 0.7s var(--ease-emphasized) both; }
+.animate-pop-in { animation: pop-in 0.6s var(--ease-emphasized) both; }
+.animate-fade-up { animation: fade-up 0.5s var(--ease-standard) both; }
+.animate-wordmark { animation: wordmark-reveal 0.9s var(--ease-emphasized) both; }
+.animate-dot-bounce { animation: dot-bounce 1.4s var(--ease-standard) infinite; }
+.animate-soft-pulse { animation: soft-pulse 2.4s var(--ease-standard) infinite; }
+.animate-spin-slow { animation: spin-slow 24s linear infinite; }
+
+/* Soft Material card */
+.m3-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.4s var(--ease-emphasized), box-shadow 0.4s var(--ease-emphasized);
+}
+.m3-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px hsl(40 30% 30% / 0.12);
+}
+
+/* Pill primary button */
+.pill-button {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 9999px;
+  font-weight: 700;
+  box-shadow: var(--shadow-pill);
+  transition: transform 0.3s var(--ease-emphasized), box-shadow 0.3s var(--ease-emphasized), background 0.3s;
+}
+.pill-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 28px hsl(45 90% 50% / 0.4);
+}
+.pill-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Wordmark with PixelOS-like serif/rounded mix */
+.wordmark {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
